@@ -8,6 +8,7 @@ class QuestionB(unittest.TestCase):
         self.assertEqual(expected, got, msg)
 
     def test_batch(self):
+        # array of [s1, s2, expected]
         cases = [
             ["2", "2", 0],
             ["a", "a", 0],
