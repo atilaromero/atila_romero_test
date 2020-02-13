@@ -21,7 +21,7 @@ class QuestionA(unittest.TestCase):
 
     def one_case(self, x1,x2,x3,x4,expected):
         """ Auxiliary test function
-            applies the funcion overlap in the input and checks if the result matches
+            applies the 'overlap' function in the input and checks if the result matches
         """
         got = overlap(x1,x2,x3,x4)
         msg = 'input: %d %d %d %d expected: %s got: %s'%(x1,x2,x3,x4,expected,got)
