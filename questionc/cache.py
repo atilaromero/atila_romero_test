@@ -3,20 +3,26 @@ import time
 from collections import namedtuple
 from typing import Dict
 
-CacheData = namedtuple('CacheData', ['prev', 'next', 'value', 'stamp'])
+class CacheData:
+    def __init__(self, prev, next_, key, value, stamp):
+        self.prev = prev
+        self.next = next_
+        self.key = key
+        self.value = value
+        self.stamp = stamp
 
 class LRUCache:
     def __init__(self, loadcb, secondstimeout):
-        self.loadcb = loadcb
-        self.timeout = secondstimeout
-        self.cache : Dict[CacheData] = {}
-        self.head = None
+        self._loadcb = loadcb
+        self._timeout = secondstimeout
+        self._cache : Dict[CacheData] = {}
+        self._head = None
 
     def get(self, key):
-        if not key in self.cache:
+        if not key in self._cache:
             return self._refresh(key)
-        cacheData : CacheData = self.cache[key]
-        expired = ((time.time()-cacheData.stamp) > self.timeout)
+        cacheData : CacheData = self._cache[key]
+        expired = ((time.time()-cacheData.stamp) > self._timeout)
         if expired:
             self._evict(cacheData)
             return self._refresh(key)
@@ -24,28 +30,44 @@ class LRUCache:
         return cacheData.value
 
     def _refresh(self, key):
-        value = self.loadcb(key)
-        cacheData = CacheData(None, None, value, time.time())
-        self._promote(cacheData)
+        """Refresh (or retrieve for the first time) cached value for corresponding key using the loadcb.
+        """
+        value = self._loadcb(key)
+        self._store(key, value)
         return value
+    
+    def _store(self, key, value):
+        """Update the key in cache with the given value"""
+        cacheData = CacheData(None, None, key, value, time.time())
+        self._cache[key] = cacheData
+        self._promote(cacheData)
 
-    def _promote(self, cacheData):
-        if self.head is cacheData:
+    def _promote(self, cacheData : CacheData):
+        """Move cacheData to the top"""
+        if self._head is cacheData:
             return
         if cacheData.prev != None:
-            prev : CacheData = cacheData.prev
+            prev = cacheData.prev
             prev.next = cacheData.next
         if cacheData.next != None:
             next_ : CacheData = cacheData.next
             next_.prev = cacheData.prev
         cacheData.stamp = time.time()
         cacheData.prev = None
-        cacheData.next = self.head
-        self.head = cacheData
+        cacheData.next = self._head
+        if cacheData.next != None:
+            cacheData.next.prev = cacheData
+        self._head = cacheData
 
     def _evict(self, key):
-        cacheData : CacheData = self.cache[key]
-        del self.cache[key]
+        """Remove cache[key] and all its descendants from cache"""
+        cacheData : CacheData = self._cache[key]
+        while not cacheData is None:
+            del self._cache[cacheData.key]
+            cacheData.prev = None
+            next_ = cacheData.next
+            cacheData.next = None
+            cacheData = next_
 
 def resolve(domain):
     return "1.2.3.4"
