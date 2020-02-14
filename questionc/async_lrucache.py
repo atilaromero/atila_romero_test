@@ -1,4 +1,5 @@
 from threading import Lock, Event
+from queue import Queue
 from lrucache import LRUCache
 
 
@@ -9,6 +10,7 @@ class AsyncLRUCache:
         self._retrievingLock = Lock() # lock for _retrieving Events dict 
         self._retrieving = {}
         self._lru = LRUCache(None, secondstimeout, sizelimit)
+        self._on_get_list = []
 
     def get(self, key):
         """get replicates the behaviour of LRUCache.get, but adding locks.
@@ -20,7 +22,10 @@ class AsyncLRUCache:
         with self._lruLock:
             cacheData = self._lru._cache[key]
             self._lru._promote(cacheData)
-            return cacheData.value
+            value = cacheData.value
+        for q in self._on_get_list:
+            q.put((key, value))
+        return value
     
     def inject(self, key, value):
         """Inject just adds the key value pair to the inner cache, setting the locks first. If a retrieve operation is already going on, it will reupdate the value, as we have no way to cancel the loadcb callback"""
@@ -51,3 +56,8 @@ class AsyncLRUCache:
                 self._retrieving[key].set()
                 del self._retrieving[key]
         return
+
+    def on_get_queue(self):
+        q = Queue()
+        self._on_get_list.append(q)
+        return q
