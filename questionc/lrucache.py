@@ -78,12 +78,15 @@ class LRUCache:
         """Remove cache[key] and all its descendants from cache.
             Deleting the circular references makes things easier for the GIL
         """
+        if not key in self._cache:
+            return
         cacheData : CacheData = self._cache[key]
         if self._head == cacheData:
             self._head = None
         self._tail = cacheData.prev
         while not cacheData is None:
-            del self._cache[cacheData.key]
+            if cacheData.key in self._cache:
+                del self._cache[cacheData.key]
             if not cacheData.prev is None:
                 cacheData.prev.next = None
             cacheData.prev = None
