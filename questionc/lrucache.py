@@ -12,9 +12,9 @@ class CacheData:
         self.stamp = stamp
 
 class LRUCache:
-    def __init__(self, loadcb, secondstimeout, sizelimit=None):
+    def __init__(self, loadcb, timeoutseconds, sizelimit=None):
         self._loadcb = loadcb
-        self.timeout = secondstimeout
+        self.timeout = timeoutseconds
         self.sizelimit = sizelimit
         self._cache : Dict[CacheData] = {}
         self._head = None

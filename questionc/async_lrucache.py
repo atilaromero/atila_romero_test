@@ -4,12 +4,12 @@ from lrucache import LRUCache
 
 
 class AsyncLRUCache:
-    def __init__(self, loadcb, secondstimeout, sizelimit=None):
+    def __init__(self, loadcb, timeoutseconds, sizelimit=None):
         self._loadcb = loadcb
         self._lruLock = Lock() # lock for inner synchronous lock _lru
         self._retrievingLock = Lock() # lock for _retrieving Events dict 
         self._retrieving = {}
-        self._lru = LRUCache(None, secondstimeout, sizelimit)
+        self._lru = LRUCache(None, timeoutseconds, sizelimit)
         self._on_get_list = []
 
     def get(self, key):
@@ -26,6 +26,15 @@ class AsyncLRUCache:
         for q in self._on_get_list:
             q.put((key, value))
         return value
+
+    def consult(self, key):
+        """Does not update anything. return (bool, value), where bool indicates if the key is in the cache"""
+        with self._lruLock:
+            if not self._lru.has(key):
+                return (False, None)
+            cacheData = self._lru._cache[key]
+            value = cacheData.value
+            return (True, value)
     
     def inject(self, key, value):
         """Inject just adds the key value pair to the inner cache, setting the locks first. If a retrieve operation is already going on, it will reupdate the value, as we have no way to cancel the loadcb callback"""
