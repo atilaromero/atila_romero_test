@@ -21,15 +21,21 @@ class LRUCache:
         self._tail = None
 
     def get(self, key):
-        if not key in self._cache:
+        if not self.has(key):
             return self._refresh(key)
+        cacheData : CacheData = self._cache[key]
+        self._promote(cacheData)
+        return cacheData.value
+
+    def has(self, key):
+        if not key in self._cache:
+            return False
         cacheData : CacheData = self._cache[key]
         expired = ((time.time()-cacheData.stamp) > self.timeout)
         if expired:
             self._evict(cacheData)
-            return self._refresh(key)
-        self._promote(cacheData)
-        return cacheData.value
+            return False
+        return True
 
     def _refresh(self, key):
         """Refresh (or retrieve for the first time) cached value for corresponding key using the loadcb.
