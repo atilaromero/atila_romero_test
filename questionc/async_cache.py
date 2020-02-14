@@ -42,6 +42,6 @@ class AsyncLRUCache:
         with self._lruLock:
             with self._retrievingLock:
                 self._lru._store(key, value)
+                self._retrieving[key].set()
                 del self._retrieving[key]
-                ev.set()
         return
