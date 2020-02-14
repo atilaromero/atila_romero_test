@@ -1,5 +1,5 @@
 from threading import Lock, Event
-from cache import LRUCache
+from lrucache import LRUCache
 
 
 class AsyncLRUCache:

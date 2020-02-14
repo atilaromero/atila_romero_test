@@ -1,7 +1,7 @@
 import unittest
 import threading
 import time
-from async_cache import AsyncLRUCache
+from async_lrucache import AsyncLRUCache
 
 class AsyncLRUCacheTest(unittest.TestCase):
     def test_multiple_gets(self):

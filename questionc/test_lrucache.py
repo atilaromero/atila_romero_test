@@ -1,8 +1,8 @@
 import unittest
 import time
-from cache import LRUCache, CacheData
+from lrucache import LRUCache, CacheData
 
-class QuestionC(unittest.TestCase):
+class LRUCacheTest(unittest.TestCase):
     def test_get1(self):
         count = 0
         def dummyLoadCB(key):
