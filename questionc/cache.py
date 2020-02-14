@@ -12,9 +12,10 @@ class CacheData:
         self.stamp = stamp
 
 class LRUCache:
-    def __init__(self, loadcb, secondstimeout):
+    def __init__(self, loadcb, secondstimeout, sizelimit=None):
         self._loadcb = loadcb
-        self._timeout = secondstimeout
+        self.timeout = secondstimeout
+        self.sizelimit = sizelimit
         self._cache : Dict[CacheData] = {}
         self._head = None
         self._tail = None
@@ -23,7 +24,7 @@ class LRUCache:
         if not key in self._cache:
             return self._refresh(key)
         cacheData : CacheData = self._cache[key]
-        expired = ((time.time()-cacheData.stamp) > self._timeout)
+        expired = ((time.time()-cacheData.stamp) > self.timeout)
         if expired:
             self._evict(cacheData)
             return self._refresh(key)
@@ -42,6 +43,8 @@ class LRUCache:
         cacheData = CacheData(None, None, key, value, time.time())
         self._cache[key] = cacheData
         self._promote(cacheData)
+        if not self.sizelimit is None:
+            self._shrink(self.sizelimit)
 
     def _promote(self, cacheData : CacheData):
         """Move cacheData to the top"""
@@ -70,6 +73,9 @@ class LRUCache:
             Deleting the circular references makes things easier for the GIL
         """
         cacheData : CacheData = self._cache[key]
+        if self._head == cacheData:
+            self._head = None
+        self._tail = cacheData.prev
         while not cacheData is None:
             del self._cache[cacheData.key]
             if not cacheData.prev is None:
@@ -77,17 +83,10 @@ class LRUCache:
             cacheData.prev = None
             next_ = cacheData.next
             cacheData.next = None
-            if self._head == cacheData:
-                self._head = None
-            if self._tail == cacheData:
-                self._tail = None
             cacheData = next_
 
-
-
-def resolve(domain):
-    return "1.2.3.4"
-
-g = LRUCache(resolve, 1)
-
-x = g.get("x.com")
+    def _shrink(self, size):
+        """shrink the oldest items in cache until it has the specified size
+        """
+        while len(self._cache) > size:
+            self._evict(self._tail.key)

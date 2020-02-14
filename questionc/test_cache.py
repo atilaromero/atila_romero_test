@@ -1,4 +1,5 @@
 import unittest
+import time
 from cache import LRUCache, CacheData
 
 class QuestionC(unittest.TestCase):
@@ -127,3 +128,57 @@ class QuestionC(unittest.TestCase):
         self.assertEqual(cache._cache[10].prev, None)
         self.assertEqual(cache._cache[10].next, None)
         self.assertGreater(cache._cache[10].stamp, prevStamp)
+
+    def test_shrink(self):
+        def dummyLoadCB(key):
+            return {"mydata": key}
+        cache = LRUCache(dummyLoadCB, 0.5)
+        cache._shrink(10)
+        self.assertEqual(len(cache._cache), 0)
+        for x in range(10):
+            cache.get(x)
+        self.assertEqual(len(cache._cache), 10)
+        cache._shrink(2)
+        self.assertEqual(len(cache._cache), 2)
+        self.assertEqual(cache._tail.key, 8)
+        self.assertEqual(cache._tail.next, None)
+        cache._shrink(0)
+        self.assertEqual(len(cache._cache), 0)
+        self.assertEqual(cache._head, None)
+        self.assertEqual(cache._tail, None)
+
+    def test_sizelimit(self):
+        def dummyLoadCB(key):
+            return {"mydata": key}
+        cache = LRUCache(dummyLoadCB, 0.5, 2)
+        for x in range(10):
+            cache.get(x)
+        self.assertEqual(len(cache._cache), 2)
+        self.assertEqual(cache._tail.key, 8)
+        self.assertEqual(cache._tail.next, None)
+        
+    def test_timeout(self):
+        count = 0
+        def dummyLoadCB(key):
+            nonlocal count
+            count += 1
+            return {"mydata": key}
+        cache = LRUCache(dummyLoadCB, 0.1, 2)
+        for x in range(3):
+            cache.get(x)
+        self.assertEqual(count, 3)
+        time.sleep(0.1)
+        for x in range(3):
+            cache.get(x)
+        self.assertEqual(count, 6)
+        time.sleep(0.05)
+        cache.get(1)
+        time.sleep(0.05)
+        cache.get(1)
+        time.sleep(0.05)
+        cache.get(1)
+        self.assertEqual(count, 6)
+        for x in range(3):
+            cache.get(x)
+        self.assertEqual(count, 8)
+        
