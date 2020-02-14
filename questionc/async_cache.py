@@ -22,6 +22,12 @@ class AsyncLRUCache:
             self._lru._promote(cacheData)
             return cacheData.value
     
+    def inject(self, key, value):
+        """Inject just adds the key value pair to the inner cache, setting the locks first. If a retrieve operation is already going on, it will reupdate the value, as we have no way to cancel the loadcb callback"""
+        with self._lruLock:
+            with self._retrievingLock:
+                self._lru._store(key, value)
+
     def _retrieve(self, key):
         """Retrieve value for key using the _loadcb callback.
         It uses events to avoid duplicate calls to _loadcb.
