@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import sys
 
-def compare(s1, s2):
+def compare(s1, s2, strict=False):
     """version.compare compares two version strings (format X.Y.Z)
     if s1 < s2, returns -1
     if s1 == s2, returns 0
     if s1 > s2, returns 1
+    if strict=False (default) 2.1 == 2
+    if strict=True 2 < 2.1
     """
     s1v = s1.split('.')
     s2v = s2.split('.')
@@ -28,7 +30,10 @@ def compare(s1, s2):
         else:
             return 1
     # if we did not return, all compared parts were equal
-    # but they may have different sizes: the shortest is considered smaller
+    if not strict:
+        return 0
+    # but they may have different sizes: 
+    # the shortest is considered smaller when strict=True
     if len(s1v) < len(s2v):
         return -1
     elif len(s2v) < len(s1v):
