@@ -15,7 +15,7 @@ This should print the result ```False```
 In a shell prompt:
 ```
 cd questiona/
-python3 setup.py install
+python3 setup.py install --user
 ```
 
 Then you can import the package in your programs like this:
@@ -26,4 +26,4 @@ print(overlap(10,20,50,60))
 ```
 
 ## How it works
-In the source code, the positions are compared. In order to the segments to be appart, both point of one line should be to the left of the points of the other line or they must both be to the right. Otherwise the lines intersect.
+In the source code, the positions are compared. In order to the segments to be appart, both points of one line should be to the left of the points of the other line or they must both be to the right. Otherwise the lines intersect.

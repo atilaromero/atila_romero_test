@@ -41,6 +41,14 @@ def compare(s1, s2, strict=False):
     else:
         return 0
 
+def compare_strict(s1, s2):
+    """return compare(s1, s2, strict=True)
+    Usefull to use as a cmp function in sort:
+        from functools import cmp_to_key 
+        sorted(["2.1.9", "1.9", "1"], key=cmp_to_key(version.compare_strict))
+    """
+    return compare(s1, s2, strict=True)
+
 if __name__ == "__main__":
     try:
         s1, s2 = sys.argv[1:]

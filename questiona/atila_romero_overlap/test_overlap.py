@@ -1,5 +1,5 @@
 import unittest
-from overlap import overlap
+from .overlap import overlap
 
 class QuestionA(unittest.TestCase):
     def multiple_cases(self,cases):

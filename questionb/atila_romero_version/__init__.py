@@ -1,0 +1,1 @@
+from .version import compare, compare_strict

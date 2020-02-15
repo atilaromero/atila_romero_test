@@ -1,9 +1,9 @@
 import unittest
-import version
+from .version import compare, compare_strict
 
 class QuestionB(unittest.TestCase):
     def one_case(self, s1, s2, expected, strict):
-        got = version.compare(s1, s2, strict)
+        got = compare(s1, s2, strict)
         msg = 'input: %s %s expected: %d got: %d'%(s1,s2,expected,got)
         self.assertEqual(expected, got, msg)
 
