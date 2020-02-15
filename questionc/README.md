@@ -3,20 +3,21 @@ A Geo Distributed LRU (Least Recently Used) cache with time expiration
 
 ## How to run the program
 Using two shell prompts:
-1 - On the first prompt
+
+1.  On the first prompt:
     ```
     cd questionc/
     python3 main.py 8000 8001 10 20
     ```
-    Argumens:
-        1 - 8000: port where the program listen for updates
-        2 - 8001: port of the peer, where to send updates to.
-        3 - 10: cache timeout in seconds
-        4 - 20: max size of the cache
+    Arguments:
+    1. 8000: port where the program listen for updates
+    2. 8001: port of the peer, where to send updates to.
+    3. 10: cache timeout in seconds
+    4. 20: max size of the cache
 
     Type a number, press enter, repeat.
 
-2 - On the second prompt (mind the inverted port numbers)
+2. On the second prompt (mind the inverted port numbers)
     ```
     cd questionc/
     python3 main.py 8001 8000 10 20
@@ -59,13 +60,16 @@ cache.get(3)
 ## How it works
 The design was divided into three parts:
 - LRUCache
+
     It does not provide safety guards for concurrent
     access, so it only should be used in single thread programs.
 
 - AsyncLRUCache
+
     It adds safety guards for concurrent access, using LRUCache as an internal cache. It uses locks to prevent race conditions.
 
 - GeoLRUCache
+
     It uses the AsyncLRUCache as a inner cache and adds the funcionality of being able to send and receive updates.
 
     After initialization, use the add_peer function to set the peers that will receive updates when the cache changes.
