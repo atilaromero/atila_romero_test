@@ -12,7 +12,16 @@ class CacheData:
         self.stamp = stamp
 
 class LRUCache:
+    """LRUCache is a Least Recently Used cache.
+    It does not provide safety guards for concurrent
+    access, so it only should be used in single thread programs.
+    """
     def __init__(self, loadcb, timeoutseconds, sizelimit=None):
+        """Parameters:
+        loadcb: callback function that accepts a key and returns a value
+        timeoutseconds: cache timeout in seconds
+        sizelimit: cache maximum size
+        """
         self._loadcb = loadcb
         self.timeout = timeoutseconds
         self.sizelimit = sizelimit
@@ -21,6 +30,9 @@ class LRUCache:
         self._tail = None
 
     def get(self, key):
+        """If the value for this key is in cache and it is not expired, return the value and update the cache timestamp for this key.
+        Otherwise, get the value from loadcb via _refresh.
+        """
         if not self.has(key):
             return self._refresh(key)
         cacheData : CacheData = self._cache[key]
@@ -28,6 +40,7 @@ class LRUCache:
         return cacheData.value
 
     def has(self, key):
+        """Returns whether the value for this key is in cache and is not expired."""
         if not key in self._cache:
             return False
         cacheData : CacheData = self._cache[key]

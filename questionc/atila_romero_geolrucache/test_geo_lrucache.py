@@ -1,7 +1,7 @@
 import unittest
 import threading
 import time
-from geo_lrucache import GeoLRUCache
+from .geo_lrucache import GeoLRUCache
 
 class GeoLRUCacheTest(unittest.TestCase):
     def test_simple(self):

@@ -1,4 +1,4 @@
-from geo_lrucache import GeoLRUCache
+from atila_romero_geolrucache import GeoLRUCache
 import sys
 
 def loadcb(key):
@@ -23,10 +23,10 @@ def main(myport, peerport, timeoutseconds, cachesize=None):
                 continue
             try:
                 key = float(line)
+                value = cache.get(key)
+                print(value)
             except:
                 print('invalid number')
-            value = cache.get(key)
-            print(value)
     except KeyboardInterrupt:
         cache.close()
     except:

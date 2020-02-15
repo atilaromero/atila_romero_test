@@ -1,4 +1,4 @@
-# Question A: Version
+# Question B: Version
 A library to compare version strings.
 
 It has two functions:

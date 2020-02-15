@@ -1,6 +1,6 @@
 import unittest
 import time
-from lrucache import LRUCache, CacheData
+from .lrucache import LRUCache, CacheData
 
 class LRUCacheTest(unittest.TestCase):
     def test_get1(self):

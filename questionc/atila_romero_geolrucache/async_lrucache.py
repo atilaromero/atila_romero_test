@@ -1,16 +1,23 @@
 from threading import Lock, Event
 from queue import Queue
-from lrucache import LRUCache
+from .lrucache import LRUCache
 
 
 class AsyncLRUCache:
+    """AsyncLRUCache is a Least Recently Used cache.
+    It adds safety guards for concurrent access, using LRUCache as an internal cache. It uses locks to prevent race conditions.
+    """
     def __init__(self, loadcb, timeoutseconds, sizelimit=None):
+        """Parameters:
+        loadcb: callback function that accepts a key and returns a value
+        timeoutseconds: cache timeout in seconds
+        sizelimit: cache maximum size
+        """
         self._loadcb = loadcb
         self._lruLock = Lock() # lock for inner synchronous lock _lru
         self._retrievingLock = Lock() # lock for _retrieving Events dict 
         self._retrieving = {}
         self._lru = LRUCache(None, timeoutseconds, sizelimit)
-        self._on_get_list = []
 
     def get(self, key):
         """get replicates the behaviour of LRUCache.get, but adding locks.
@@ -23,8 +30,6 @@ class AsyncLRUCache:
             cacheData = self._lru._cache[key]
             self._lru._promote(cacheData)
             value = cacheData.value
-        for q in self._on_get_list:
-            q.put((key, value))
         return value
 
     def consult(self, key):
@@ -65,8 +70,3 @@ class AsyncLRUCache:
                 self._retrieving[key].set()
                 del self._retrieving[key]
         return
-
-    def on_get_queue(self):
-        q = Queue()
-        self._on_get_list.append(q)
-        return q
