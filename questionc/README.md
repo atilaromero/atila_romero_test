@@ -1,7 +1,9 @@
 # Question C: GeoLRUCache
 A Geo Distributed LRU (Least Recently Used) cache with time expiration
 
-## How to run the program
+## How to run the sample program
+It is an example application that uses the GeoLRUCache library
+
 Using two shell prompts:
 
 1.  On the first prompt:
